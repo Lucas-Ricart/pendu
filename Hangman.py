@@ -1,5 +1,6 @@
 import pygame
 import random
+import os
 
 pygame.init()
 
@@ -7,7 +8,6 @@ pygame.init()
 width, height = 720, 480
 win = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Hangman_Game.py")
-
 
 #colors
 white = (255, 255, 255)
@@ -25,20 +25,30 @@ for i in range(26) :
     y = starty + ((i // 13) * (gap + radius * 2))
     letters.append([x, y, chr(A + i), True])
 
-
 #fonts
 font = pygame.font.SysFont('comicsans', 25)
 
+#load images
+images = []
+for i in range(8) :
+    image = pygame.image.load("hangman" + str(i) + ".png")
+    images.append(image)
+
+#setup game loop
+FPS = 60
+clock = pygame.time.Clock()
+run = True
+
 #game variables
-words = []
-pseudo_ok = False
-pseudo = ""
+add = False
+add_word = ""
+display_lb = False
+score = 0
 choice = True
-add = ""
-leaderboard = False
+name_ok = False
+name = ""
 choose_difficulty = False
 difficulty_level = None
-add_word = ""
 def restart(difficulty_level) :
     """reset variables"""
     fail = 0
@@ -65,28 +75,47 @@ def restart(difficulty_level) :
         word = random.choice(words3).upper()
     print(word)
     return word, fail, guessed, letters, guess
+
 word, fail, guessed, letters, guess = restart(difficulty_level)
-    
-#load images
-images = []
-for i in range(8) :
-    image = pygame.image.load("hangman" + str(i) + ".png")
-    images.append(image)
 
-#setup game loop
-FPS = 60
-clock = pygame.time.Clock()
-run = True
+if not os.path.exists("scores.txt"):
+    with open("scores.txt", "w") as f:
+        pass
 
-def draw() :
+def add_score(name, score):
+    """add a score."""
+    with open("scores.txt", "a") as f:
+        f.write(f"{name}:{score}\n")
+
+def read_scores():
+    """Read scores from the file and return a sorted list."""
+    scores = []
+    with open("scores.txt", "r") as f:
+        for line in f:
+            try:
+                name, score = line.strip().split(":")
+                scores.append((name, int(score)))
+            except ValueError:
+                continue
+    return sorted(scores, key=lambda x: x[1], reverse=True)
+
+def draw(name) :
     #draw background
     win.fill(white)
     if add == True :
         text = font.render(f"Enter a new word : {add_word}", 1, black)
         win.blit(text, text.get_rect(center=(width//2, height//2)))
-    elif leaderboard == True :
-        #attention
-        None
+    elif display_lb == True :
+        title = font.render("Leaderboard", 1, black)
+        win.blit(title, (width // 2 - title.get_width() // 2, 50))
+        scores = read_scores()
+        y = 100
+        for i, (name, score) in enumerate(scores[:10]):  # Top 10 scores
+            text = font.render(f"{i + 1}. {name}: {score}", 1, black)
+            win.blit(text, (260, y))
+            y += 30
+        back_text = font.render("Press ESC to return to the menu.", 1, black)
+        win.blit(back_text, (width // 2 - back_text.get_width() // 2, height - 50))
     elif choice == True :
         #draw selection 
         text = font.render("Press enter to start a game", 1, black)
@@ -95,9 +124,9 @@ def draw() :
         win.blit(text, text.get_rect(center=(width//2, height//2)))
         text = font.render("Press S to see the leaderboard", 1, black)
         win.blit(text, text.get_rect(center=(width//2, height//2+25)))
-    elif pseudo_ok == False :
-        #draw pseudo selection
-        text = font.render(f"Choose a pseudo : {pseudo}", 1, black)
+    elif name_ok == False :
+        #draw name selection
+        text = font.render(f"Choose a name : {name}", 1, black)
         win.blit(text, text.get_rect(center=(width//2, height//2)))
     elif choose_difficulty == True :
         text = font.render("Choose a difficulty :", 1, black)
@@ -146,44 +175,48 @@ def draw() :
 
 while run :
     clock.tick(FPS)
-
-    
-
-
-    draw()
+    draw(name)
     #verify input
     guess = ""
     for letter in word :
         if letter in guessed :
-            guess += letter 
-
+            guess += letter
+    #check input
     for event in pygame.event.get() :
         if event.type == pygame.QUIT :
             run = False
         elif event.type == pygame.KEYDOWN :
             if event.key == pygame.K_ESCAPE :
+                add_score(name, score)
                 #ajouter score ici
                 words = []
-                pseudo_ok = False
-                pseudo = ""
+                name_ok = False
+                name = ""
                 choice = True
-                add = ""
-                leaderboard = False
+                add = False
+                display_lb = False
+                score = 0
                 choose_difficulty = False
                 difficulty_level = None
                 add_word = ""
                 word, fail, guessed, letters, guess = restart(difficulty_level)
             elif guess == word :
-                if event.key ==13 :
+                #increase score
+                if guess == word :
+                    score += len(word)*5
+                    guess = ""
+                if event.key ==13 or event.key == 1073741912 :
                     word, fail, guessed, letters, guess = restart(difficulty_level)
             elif fail == 7 :
-                if event.key == 13 :
+                if event.key == 13 or event.key == 1073741912 :
+                    score = add_score(name, score)
                     words = []
-                    pseudo_ok = False
-                    pseudo = ""
+                    name_ok = False
+                    name = ""
                     choice = True
-                    add = ""
-                    leaderboard = False
+                    add = False
+                    display_lb = False
+                    score = 0
                     choose_difficulty = False
                     difficulty_level = None
                     add_word = ""
@@ -191,7 +224,7 @@ while run :
             elif add == True :
                 if event.key == pygame.K_BACKSPACE :
                     add_word = add_word[:-1]
-                elif event.key == 13 :
+                elif event.key == 13 or event.key == 1073741912 :
                     add = False
                     if add_word != "" and " " not in add_word :
                         with open("words.txt", "a") as fl :
@@ -199,24 +232,26 @@ while run :
                         add_word = ""
                 else :
                     add_word += event.unicode.lower()
-            elif leaderboard == True :
+            elif display_lb == True :
                 #attention afficher score ici
                 None
             elif choice == True :
-                if event.key == 13 :
+                if event.key == 13 or event.key == 1073741912 :
                     choice = False
                 elif event.key == 97 :
                     add = True
                 elif event.key == 115 :
-                    leaderboard = True
-            elif pseudo_ok == False :
+                    display_lb = True
+            elif name_ok == False :
                 if event.key == pygame.K_BACKSPACE :
-                    pseudo = pseudo[:-1]
-                elif event.key == 13 :
-                    pseudo_ok = True
+                    name = name[:-1]
+                elif event.key == 13 or event.key == 1073741912 :
+                    name_ok = True
                     choose_difficulty = True
+                    if name == "" :
+                        name = "AAA"
                 else :
-                    pseudo += event.unicode.upper()
+                    name += event.unicode.upper()
             elif choose_difficulty == True :
                 if event.key == 49 or event.key == 1073741913 :
                     difficulty_level = 1
