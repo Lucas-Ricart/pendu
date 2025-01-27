@@ -5,18 +5,18 @@ import os
 pygame.init()
 
 #set window
-width, height = 720, 480
-win = pygame.display.set_mode((width, height))
+WIDTH, HEIGHT = 720, 480
+win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Hangman_Game.py")
 
 #colors
-white = (255, 255, 255)
-black = (0, 0, 0)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
 #display alphabet
 radius = 20
 gap = 15
-startx = round((width - (radius * 2 + gap) * 13) / 2)
+startx = round((WIDTH - (radius * 2 + gap) * 13) / 2)
 starty = 360
 A = 65
 letters = []
@@ -104,54 +104,54 @@ def read_scores():
 
 def draw(name) :
     #draw background
-    win.fill(white)
+    win.fill(WHITE)
     if add == True :
-        text = font.render(f"Enter a new word : {add_word}", 1, black)
-        win.blit(text, text.get_rect(center=(width//2, height//2)))
+        text = font.render(f"Enter a new word : {add_word}", 1, BLACK)
+        win.blit(text, text.get_rect(center=(WIDTH//2, HEIGHT//2)))
     elif display_lb == True :
-        title = font.render("Leaderboard", 1, black)
-        win.blit(title, (width // 2 - title.get_width() // 2, 50))
+        title = font.render("Leaderboard", 1, BLACK)
+        win.blit(title, (WIDTH // 2 - title.get_width() // 2, 50))
         scores = read_scores()
         y = 100
         for i, (name, score) in enumerate(scores[:10]):  # Top 10 scores
-            text = font.render(f"{i + 1}. {name}: {score}", 1, black)
+            text = font.render(f"{i + 1}. {name}: {score}", 1, BLACK)
             win.blit(text, (260, y))
             y += 30
-        back_text = font.render("Press ESC to return to the menu.", 1, black)
-        win.blit(back_text, (width // 2 - back_text.get_width() // 2, height - 50))
+        back_text = font.render("Press ESC to return to the menu.", 1, BLACK)
+        win.blit(back_text, (WIDTH // 2 - back_text.get_width() // 2, HEIGHT - 50))
     elif choice == True :
         #draw selection 
-        text = font.render("Press enter to start a game", 1, black)
-        win.blit(text, text.get_rect(center=(width//2, height//2-25)))
-        text = font.render("Press A to add a word in the game", 1, black)
-        win.blit(text, text.get_rect(center=(width//2, height//2)))
-        text = font.render("Press S to see the leaderboard", 1, black)
-        win.blit(text, text.get_rect(center=(width//2, height//2+25)))
+        text = font.render("Press enter to start a game", 1, BLACK)
+        win.blit(text, text.get_rect(center=(WIDTH//2, HEIGHT//2-25)))
+        text = font.render("Press A to add a word in the game", 1, BLACK)
+        win.blit(text, text.get_rect(center=(WIDTH//2, HEIGHT//2)))
+        text = font.render("Press S to see the leaderboard", 1, BLACK)
+        win.blit(text, text.get_rect(center=(WIDTH//2, HEIGHT//2+25)))
     elif name_ok == False :
         #draw name selection
-        text = font.render(f"Choose a name : {name}", 1, black)
-        win.blit(text, text.get_rect(center=(width//2, height//2)))
+        text = font.render(f"Choose a name : {name}", 1, BLACK)
+        win.blit(text, text.get_rect(center=(WIDTH//2, HEIGHT//2)))
     elif choose_difficulty == True :
-        text = font.render("Choose a difficulty :", 1, black)
-        win.blit(text, text.get_rect(center=(width//2, height//2-37.5)))
-        text = font.render("1. Easy", 1, black)
-        win.blit(text, text.get_rect(center=(width//2, height//2-12.5)))
-        text = font.render("2. Normal", 1, black)
-        win.blit(text, text.get_rect(center=(width//2, height//2+12.5)))
-        text = font.render("3. Hard", 1, black)
-        win.blit(text, text.get_rect(center=(width//2, height//2+37.5)))
+        text = font.render("Choose a difficulty :", 1, BLACK)
+        win.blit(text, text.get_rect(center=(WIDTH//2, HEIGHT//2-37.5)))
+        text = font.render("1. Easy", 1, BLACK)
+        win.blit(text, text.get_rect(center=(WIDTH//2, HEIGHT//2-12.5)))
+        text = font.render("2. Normal", 1, BLACK)
+        win.blit(text, text.get_rect(center=(WIDTH//2, HEIGHT//2+12.5)))
+        text = font.render("3. Hard", 1, BLACK)
+        win.blit(text, text.get_rect(center=(WIDTH//2, HEIGHT//2+37.5)))
     
     else :
         #draw hangman
-        win.blit(images[fail], image.get_rect(center=(width//2+20, 125)))
+        win.blit(images[fail], image.get_rect(center=(WIDTH//2+20, 125)))
         if fail < 7 :
             #winning screen
             if guess == word :
-                text = font.render("WINNER! PRESS ENTER TO RESTART.", 1, black)
+                text = font.render("WINNER! PRESS ENTER TO RESTART.", 1, BLACK)
                 if fail > 0 :
-                    win.blit(text, text.get_rect(center=(width//2, height//2+100)))
+                    win.blit(text, text.get_rect(center=(WIDTH//2, HEIGHT//2+100)))
                 else :
-                    win.blit(text, text.get_rect(center=(width//2, height//2)))
+                    win.blit(text, text.get_rect(center=(WIDTH//2, HEIGHT//2)))
             else :
                 #draw word
                 display_word = ""
@@ -160,18 +160,18 @@ def draw(name) :
                         display_word += letter + " "
                     else :
                         display_word += "_ "
-                text = font.render(display_word, 1, black)
-                win.blit(text, text.get_rect(center=(width//2, height//2+35)))
+                text = font.render(display_word, 1, BLACK)
+                win.blit(text, text.get_rect(center=(WIDTH//2, HEIGHT//2+35)))
                 #draw buttons
                 for letter in letters :
                     x, y, ltr, visible = letter
                     if visible :
-                        text = font.render(ltr, 1, black)
+                        text = font.render(ltr, 1, BLACK)
                         win.blit(text, (x - text.get_width() / 2-3, y - text.get_height() / 2+50))
         else:
             #loosing screen
-            loser = font.render("LOOSER! PRESS ENTER TO RESTART.", 1, black)
-            win.blit(loser, loser.get_rect(center=(width//2, height//2)))
+            loser = font.render("LOOSER! PRESS ENTER TO RESTART.", 1, BLACK)
+            win.blit(loser, loser.get_rect(center=(WIDTH//2, HEIGHT//2)))
     pygame.display.update()
 
 
