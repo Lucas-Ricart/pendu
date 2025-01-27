@@ -40,15 +40,18 @@ clock = pygame.time.Clock()
 run = True
 
 #game variables
-add = False
-add_word = ""
-display_lb = False
-score = 0
-choice = True
-name_ok = False
-name = ""
-choose_difficulty = False
-difficulty_level = None
+def reset_all() :
+    add = False
+    add_word = ""
+    display_lb = False
+    score = 0
+    choice = True
+    name_ok = False
+    name = ""
+    choose_difficulty = False
+    difficulty_level = None
+    return name_ok, name, choice, add, display_lb, score, choose_difficulty, difficulty_level, add_word
+name_ok, name, choice, add, display_lb, score, choose_difficulty, difficulty_level, add_word = reset_all()
 def restart(difficulty_level) :
     """reset variables"""
     fail = 0
@@ -189,16 +192,7 @@ while run :
             if event.key == pygame.K_ESCAPE :
                 add_score(name, score)
                 #ajouter score ici
-                words = []
-                name_ok = False
-                name = ""
-                choice = True
-                add = False
-                display_lb = False
-                score = 0
-                choose_difficulty = False
-                difficulty_level = None
-                add_word = ""
+                name_ok, name, choice, add, display_lb, score, choose_difficulty, difficulty_level, add_word = reset_all()
                 word, fail, guessed, letters, guess = restart(difficulty_level)
             elif guess == word :
                 #increase score
@@ -210,16 +204,7 @@ while run :
             elif fail == 7 :
                 if event.key == 13 or event.key == 1073741912 :
                     score = add_score(name, score)
-                    words = []
-                    name_ok = False
-                    name = ""
-                    choice = True
-                    add = False
-                    display_lb = False
-                    score = 0
-                    choose_difficulty = False
-                    difficulty_level = None
-                    add_word = ""
+                    name_ok, name, choice, add, display_lb, score, choose_difficulty, difficulty_level, add_word = reset_all()
                     word, fail, guessed, letters, guess = restart(difficulty_level)
             elif add == True :
                 if event.key == pygame.K_BACKSPACE :
@@ -232,9 +217,6 @@ while run :
                         add_word = ""
                 else :
                     add_word += event.unicode.lower()
-            elif display_lb == True :
-                #attention afficher score ici
-                None
             elif choice == True :
                 if event.key == 13 or event.key == 1073741912 :
                     choice = False
